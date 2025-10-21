@@ -1,0 +1,47 @@
+/*
+ * Device Tree Source Include file for NXP Simulated Temperature Sensor
+ * 
+ * This file defines the device tree properties for the NXP simulated
+ * temperature sensor driver. It can be included in board-specific
+ * device tree files to enable the temperature sensor functionality.
+ */
+
+/ {
+    /* NXP Simulated Temperature Sensor */
+    simtemp: temperature-sensor@0 {
+        compatible = "nxp,simtemp";
+        
+        /* Memory region (example - adjust for actual hardware) */
+        reg = <0x0 0x40000000 0x0 0x1000>;
+        
+        /* Interrupt configuration (example - adjust for actual hardware) */
+        interrupts = <0 45 4>;  /* IRQ 45, level triggered */
+        
+        /* Driver-specific properties */
+        sampling-ms = <100>;        /* Temperature sampling period in milliseconds */
+        threshold-mC = <45000>;     /* Alert threshold in milli-degrees Celsius (45°C) */
+        mode = "normal";            /* Simulation mode: normal, noisy, or ramp */
+        
+        /* Optional: Status property */
+        status = "okay";
+    };
+};
+
+/*
+ * Alternative configuration examples:
+ * 
+ * For a faster sampling sensor:
+ * sampling-ms = <50>;
+ * threshold-mC = <50000>;
+ * mode = "noisy";
+ * 
+ * For a ramp testing sensor:
+ * sampling-ms = <25>;
+ * threshold-mC = <24500>;
+ * mode = "ramp";
+ * 
+ * For a high-temperature monitoring sensor:
+ * sampling-ms = <200>;
+ * threshold-mC = <80000>;
+ * mode = "normal";
+ */

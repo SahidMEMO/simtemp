@@ -1,0 +1,43 @@
+# Build output directory
+out/
+
+# Kernel module build artifacts (in source directory)
+kernel/*.ko
+kernel/*.mod.c
+kernel/*.mod.o
+kernel/*.o
+kernel/Module.symvers
+kernel/modules.order
+
+# User application build artifacts (in source directory)
+user/cli/main
+user/gui/*.exe
+user/gui/*.app
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Test files
+/tmp/test_poll
+/tmp/test_poll.c

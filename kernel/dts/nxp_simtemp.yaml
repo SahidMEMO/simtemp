@@ -1,0 +1,106 @@
+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/misc/nxp,simtemp.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: NXP Simulated Temperature Sensor
+
+maintainers:
+  - NXP Systems Software Engineer Challenge <challenge@nxp.com>
+
+description: |
+  The NXP Simulated Temperature Sensor is a software-based temperature
+  sensor driver that generates simulated temperature readings for testing
+  and development purposes. It supports multiple simulation modes and
+  provides configurable sampling rates and alert thresholds.
+
+properties:
+  compatible:
+    const: nxp,simtemp
+
+  reg:
+    maxItems: 1
+    description: |
+      Memory region for the temperature sensor. This is a placeholder
+      for actual hardware memory mapping.
+
+  interrupts:
+    maxItems: 1
+    description: |
+      Interrupt line for the temperature sensor. This is a placeholder
+      for actual hardware interrupt configuration.
+
+  sampling-ms:
+    $ref: /schemas/types.yaml#/definitions/uint32
+    minimum: 1
+    maximum: 10000
+    default: 100
+    description: |
+      Temperature sampling period in milliseconds. Controls how often
+      the sensor generates new temperature readings.
+
+  threshold-mC:
+    $ref: /schemas/types.yaml#/definitions/int32
+    default: 45000
+    description: |
+      Temperature alert threshold in milli-degrees Celsius. When the
+      temperature crosses this threshold, an alert flag is set in the
+      temperature sample.
+
+  mode:
+    $ref: /schemas/types.yaml#/definitions/string
+    enum: [normal, noisy, ramp]
+    default: normal
+    description: |
+      Temperature simulation mode:
+      - normal: Constant temperature at base value
+      - noisy: Base temperature with random noise (±1°C)
+      - ramp: Temperature ramps up and down periodically
+
+  status:
+    $ref: /schemas/types.yaml#/definitions/string
+    enum: [okay, disabled]
+    default: okay
+    description: |
+      Device status. Set to "disabled" to disable the sensor.
+
+required:
+  - compatible
+
+examples:
+  - |
+    // Basic configuration
+    simtemp: temperature-sensor@0 {
+        compatible = "nxp,simtemp";
+        reg = <0x0 0x40000000 0x0 0x1000>;
+        interrupts = <0 45 4>;
+        sampling-ms = <100>;
+        threshold-mC = <45000>;
+        mode = "normal";
+        status = "okay";
+    };
+
+  - |
+    // High-frequency sampling for testing
+    simtemp: temperature-sensor@0 {
+        compatible = "nxp,simtemp";
+        reg = <0x0 0x40000000 0x0 0x1000>;
+        interrupts = <0 45 4>;
+        sampling-ms = <25>;
+        threshold-mC = <24500>;
+        mode = "ramp";
+        status = "okay";
+    };
+
+  - |
+    // Noisy sensor for stress testing
+    simtemp: temperature-sensor@0 {
+        compatible = "nxp,simtemp";
+        reg = <0x0 0x40000000 0x0 0x1000>;
+        interrupts = <0 45 4>;
+        sampling-ms = <50>;
+        threshold-mC = <50000>;
+        mode = "noisy";
+        status = "okay";
+    };
