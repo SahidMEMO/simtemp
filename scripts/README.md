@@ -6,14 +6,12 @@ This directory contains essential scripts for building, testing, and running the
 
 ### Core Scripts
 
-- **`build.sh`** - Main build script that compiles the kernel module and checks dependencies
-- **`test.sh`** - Streamlined test script for essential driver functionality testing
-- **`run_demo.sh`** - Complete demo script that shows full driver functionality
+- **`build.sh`** - Main build script that compiles the kernel module and user applications
+- **`run_demo.sh`** - Complete demo script that shows full driver functionality with testing
 
-### Utility Scripts
+### Documentation
 
-- **`create_platform_device.sh`** - Helper script to create platform devices for testing
-- **`test_nxp_simtemp.py`** - Python-based comprehensive test suite
+- **`README.md`** - This documentation file
 
 ## Quick Start
 
@@ -22,14 +20,15 @@ This directory contains essential scripts for building, testing, and running the
    ./scripts/build.sh
    ```
 
-2. **Run basic tests:**
+2. **Run full demo:**
    ```bash
-   ./scripts/test.sh
+   sudo ./scripts/run_demo.sh
    ```
 
-3. **Run full demo:**
+3. **Test specific features:**
    ```bash
-   ./scripts/run_demo.sh
+   sudo ./scripts/run_demo.sh --test-alert
+   sudo ./scripts/run_demo.sh --test-dt
    ```
 
 ## Script Details
@@ -37,40 +36,27 @@ This directory contains essential scripts for building, testing, and running the
 ### build.sh
 - Checks system dependencies (make, gcc, kernel headers)
 - Builds the kernel module using the appropriate kernel headers
+- Builds user space applications (Python and C++ CLIs)
 - Provides helpful error messages for missing dependencies
-- Builds user space applications (if available)
-
-### test.sh
-- **Test 1**: Load/Unload module and verify device creation
-- **Test 2**: Device I/O operations (read/write)
-- **Test 3**: Sysfs configuration (sampling_ms, threshold_mC, mode)
-- **Test 4**: Error handling (invalid inputs)
-- Provides clear pass/fail results with summary
+- Supports build options: `--kernel-only`, `--user-only`, `--clean`
 
 ### run_demo.sh
 - Complete demonstration of driver functionality
-- Loads module, creates platform device, configures parameters
-- Shows live temperature readings
-- Demonstrates threshold crossing events
+- Loads module, configures parameters, shows live temperature readings
+- Demonstrates threshold crossing events and alert functionality
+- Includes comprehensive testing modes:
+  - `--test-alert`: Tests alert functionality with ramp mode
+  - `--test-dt`: Tests device tree integration
+  - `--test-only`: Runs tests without interactive demo
 - Clean shutdown and module removal
-
-### create_platform_device.sh
-- Creates platform devices for testing when not using device tree
-- Handles different methods of platform device creation
-- Useful for manual testing and debugging
-
-### test_nxp_simtemp.py
-- Python-based comprehensive test suite
-- Implements all test cases from the challenge document
-- Better error handling and reporting
-- Cross-platform compatibility
 
 ## Requirements
 
 - Linux system with kernel headers installed
 - Root access for module loading/unloading
 - Build tools (make, gcc)
-- Python 3 (for Python test suite)
+- Python 3 (for Python CLI)
+- C++ compiler (for C++ CLI)
 
 ## Installation
 
@@ -80,34 +66,39 @@ sudo apt-get update
 sudo apt-get install build-essential linux-headers-$(uname -r)
 
 # Make scripts executable
-chmod +x scripts/*.sh scripts/*.py
+chmod +x scripts/*.sh
 ```
 
 ## Usage Examples
 
 ### Basic Testing
 ```bash
-# Build and test
+# Build everything
 ./scripts/build.sh
-./scripts/test.sh
+
+# Run complete demonstration
+sudo ./scripts/run_demo.sh
 ```
 
-### Full Demo
+### Advanced Testing
 ```bash
-# Run complete demonstration
-./scripts/run_demo.sh
+# Test alert functionality
+sudo ./scripts/run_demo.sh --test-alert
+
+# Test device tree integration
+sudo ./scripts/run_demo.sh --test-dt
+
+# Run tests only (no interactive demo)
+sudo ./scripts/run_demo.sh --test-only
 ```
 
 ### Manual Testing
 ```bash
 # Load module manually
-sudo insmod kernel/nxp_simtemp.ko
-
-# Create platform device
-./scripts/create_platform_device.sh
+sudo insmod out/kernel/nxp_simtemp.ko
 
 # Test device
-cat /dev/simtemp
+./out/user/cli/simtemp_cli_py --monitor
 
 # Unload module
 sudo rmmod nxp_simtemp
@@ -118,11 +109,12 @@ sudo rmmod nxp_simtemp
 - **Build fails**: Check if kernel headers are installed
 - **Module won't load**: Check dmesg for error messages
 - **Device not created**: Verify platform device creation
-- **Permission denied**: Ensure you have sudo access but don't run as root
+- **Permission denied**: Ensure you have sudo access for module operations
+- **CLI not found**: Run `./scripts/build.sh` to build user applications
 
 ## Notes
 
-- The `test.sh` script is designed for quick validation
-- The `run_demo.sh` script provides a complete demonstration
-- The Python test suite offers the most comprehensive testing
+- The `run_demo.sh` script provides comprehensive testing and demonstration
 - All scripts include proper cleanup and error handling
+- Build artifacts are placed in the `out/` directory
+- Both Python and C++ CLIs provide identical functionality

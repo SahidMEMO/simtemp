@@ -7,7 +7,7 @@ This project implements a complete Linux kernel driver that simulates a temperat
 ```
 simtemp/
 ├── kernel/                           # Kernel module source code
-│   ├── nxp_simtemp.c                # Main driver implementation (1217 lines)
+│   ├── nxp_simtemp.c                # Main driver implementation (1300+ lines)
 │   ├── nxp_simtemp.h                # Header file with data structures and extern declarations
 │   ├── Makefile                     # Kernel module build system
 │   └── dts/                         # Device Tree Source files
@@ -16,21 +16,21 @@ simtemp/
 │       └── README.md                # Device tree usage guide
 ├── user/                            # User space applications
 │   └── cli/
-│       ├── main.py                  # Python CLI application (322 lines)
-│       ├── main.cpp                 # C++ CLI application (393 lines)
+│       ├── main.py                  # Python CLI application (320+ lines)
+│       ├── main.cpp                 # C++ CLI application (390+ lines)
 │       └── Makefile                 # User app build system
 ├── scripts/                         # Build and test scripts
 │   ├── build.sh                     # Main build script
-│   ├── run_demo.sh                  # Comprehensive demo and test script (660 lines)
-│   ├── create_platform_device.sh    # Platform device creation (obsolete)
-│   └── test_nxp_simtemp.py          # Python test suite (obsolete)
-├── out/                             # Build output directory
+│   ├── run_demo.sh                  # Comprehensive demo and test script
+│   └── README.md                    # Scripts documentation
+├── out/                             # Build output directory (created during build)
 │   ├── kernel/                      # Kernel module build artifacts
-│   │   └── nxp_simtemp.ko          # Compiled kernel module
+│   │   ├── nxp_simtemp.ko          # Compiled kernel module
+│   │   └── nxp_simtemp.mod         # Module dependency file
 │   └── user/                        # User application build artifacts
 │       └── cli/
 │           ├── simtemp_cli_cpp      # Compiled C++ CLI executable
-│           └── simtemp_cli_py       # Python CLI script (symlink)
+│           └── simtemp_cli_py       # Python CLI script (symlink or copy)
 ├── Makefile                         # Top-level build system with device tree testing
 └── .gitignore                      # Git ignore rules
 ```
@@ -55,7 +55,7 @@ simtemp/
 - **Configuration**: Runtime configuration of sampling period, threshold, and mode
 - **Monitoring**: Real-time temperature monitoring with formatted output
 - **Testing**: Automated test mode for threshold crossing validation
-- **Device Tree Testing**: Comprehensive testing with and without device tree
+- **Statistics**: Device statistics display and monitoring
 
 ## Quick Start
 
@@ -117,15 +117,11 @@ simtemp: temperature-sensor@0 {
 
 ### Testing Device Tree
 ```bash
-# Test without device tree (default values)
+# Test device tree functionality
 make test_dt
-
-# Test with device tree (custom values)
-make test_dt_custom
 
 # Or using direct script commands
 sudo ./scripts/run_demo.sh --test-dt
-sudo ./scripts/run_demo.sh --test-dt-custom
 ```
 
 ## Usage Examples
@@ -167,7 +163,6 @@ make test_alert
 
 # Test device tree functionality
 make test_dt
-make test_dt_custom
 ```
 
 ## API Reference
@@ -233,7 +228,6 @@ make test_alert
 
 # Test device tree integration
 make test_dt
-make test_dt_custom
 ```
 
 ### Manual Testing
@@ -354,10 +348,9 @@ make
 - `main.cpp`: C++ CLI with identical functionality
 
 ### Scripts
-- `build.sh`: Comprehensive build system
-- `run_demo.sh`: Complete testing and demonstration script
-- `create_platform_device.sh`: Obsolete platform device creation
-- `test_nxp_simtemp.py`: Obsolete Python test suite
+- `build.sh`: Comprehensive build system with kernel and user app support
+- `run_demo.sh`: Complete testing and demonstration script with alert testing
+- `README.md`: Scripts documentation and usage guide
 
 ## License
 
