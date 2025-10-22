@@ -275,8 +275,11 @@ main() {
     fi
     echo ""
     echo "Next steps:"
-    echo "1. Load the module: sudo insmod out/kernel/nxp_simtemp.ko"
-    echo "2. Test the device: ./scripts/run_demo.sh"
+    echo "1. Load the module: make load"
+    echo "2. Test the device: make test"
+    echo "3. Monitor temperature: make monitor"
+    echo "4. Show configuration: make config"
+    echo "5. Unload when done: make unload"
     echo ""
 }
 

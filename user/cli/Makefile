@@ -30,7 +30,7 @@ $(OUT_DIR)/simtemp_cli_cpp: $(CPP_SRC)
 # Python CLI application (create symlink with copy fallback)
 $(OUT_DIR)/simtemp_cli_py: $(PY_SRC)
 	@mkdir -p $(OUT_DIR)
-	ln -sf $(abspath $(PY_SRC)) $@ 2>/dev/null || cp -f $(PY_SRC) $@
+	ln -sf $(abspath $(PY_SRC)) $@ 2>/dev/null || (cp -f $(PY_SRC) $@ && sed -i 's/\r$$//' $@)
 	chmod +x $@
 
 # Clean target

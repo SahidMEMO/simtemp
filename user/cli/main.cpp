@@ -272,6 +272,7 @@ void showUsage(const char* program_name) {
     std::cout << "  --set-sampling MS       Set sampling period (ms)" << std::endl;
     std::cout << "  --set-threshold MC      Set threshold (mC)" << std::endl;
     std::cout << "  --set-mode MODE         Set mode (normal/noisy/ramp)" << std::endl;
+    std::cout << "  --reset                 Reset all configuration to defaults" << std::endl;
     std::cout << "  --help                  Show this help message" << std::endl;
     std::cout << std::endl;
     std::cout << "Default behavior: show a few samples" << std::endl;
@@ -301,6 +302,7 @@ int main(int argc, char* argv[]) {
     std::string set_sampling;
     std::string set_threshold;
     std::string set_mode;
+    bool reset = false;
     
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -328,6 +330,8 @@ int main(int argc, char* argv[]) {
             set_threshold = argv[++i];
         } else if (arg == "--set-mode" && i + 1 < argc) {
             set_mode = argv[++i];
+        } else if (arg == "--reset") {
+            reset = true;
         } else {
             std::cerr << "Unknown option: " << arg << std::endl;
             showUsage(argv[0]);
@@ -363,6 +367,18 @@ int main(int argc, char* argv[]) {
         if (!set_mode.empty()) {
             device.configure("mode", set_mode);
             std::cout << "Mode set to " << set_mode << std::endl;
+        }
+        
+        if (reset) {
+            std::cout << "Resetting configuration to defaults..." << std::endl;
+            device.configure("sampling_ms", "100");
+            device.configure("threshold_mC", "45000");
+            device.configure("mode", "normal");
+            std::cout << "Configuration reset to defaults:" << std::endl;
+            std::cout << "  sampling_ms: 100" << std::endl;
+            std::cout << "  threshold_mC: 45000" << std::endl;
+            std::cout << "  mode: normal" << std::endl;
+            return 0;
         }
         
         if (!set_sampling.empty() || !set_threshold.empty() || !set_mode.empty()) {

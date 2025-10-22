@@ -23,10 +23,18 @@ simtemp/
 │   ├── build.sh                     # Main build script
 │   ├── run_demo.sh                  # Comprehensive demo and test script
 │   └── README.md                    # Scripts documentation
+├── docs/                            # Documentation
+│   ├── DESIGN.md                    # Architecture and design documentation
+│   └── AI_NOTES.md                  # AI development notes and prompts
 ├── out/                             # Build output directory (created during build)
 │   ├── kernel/                      # Kernel module build artifacts
 │   │   ├── nxp_simtemp.ko          # Compiled kernel module
-│   │   └── nxp_simtemp.mod         # Module dependency file
+│   │   ├── nxp_simtemp.mod         # Module dependency file
+│   │   ├── nxp_simtemp.mod.c       # Module source file
+│   │   ├── nxp_simtemp.mod.o       # Module object file
+│   │   ├── nxp_simtemp.o           # Main object file
+│   │   ├── Module.symvers          # Module symbol versions
+│   │   └── modules.order            # Module build order
 │   └── user/                        # User application build artifacts
 │       └── cli/
 │           ├── simtemp_cli_cpp      # Compiled C++ CLI executable
@@ -66,37 +74,72 @@ simtemp/
 - C++ compiler (for C++ CLI)
 - Device tree compiler (dtc) for device tree testing
 
-### Building
+### Complete Workflow
 ```bash
-# Build everything (recommended)
+# 1. Build everything
 make
 
-# Or use the build script
-./scripts/build.sh
+# 2. Load kernel module
+make load
 
-# Or build components individually
-make kernel          # Build kernel module only
-make user           # Build user apps only
+# 3. Show current configuration
+make config
 
-# Clean build artifacts
-make clean
+# 4. Monitor temperature readings
+make monitor
+
+# 5. Test alert functionality
+make test_alert
+
+# 6. Unload when done
+make unload
 ```
 
-### Running
-```bash
-# Complete demo with testing
-sudo ./scripts/run_demo.sh
+For detailed command reference, see [Make Commands Reference](#make-commands-reference).
 
-# Or manually:
-sudo insmod out/kernel/nxp_simtemp.ko
-./out/user/cli/simtemp_cli_py --monitor
-sudo rmmod nxp_simtemp
+## Make Commands Reference
 
-# Or use make targets:
-make load           # Build and load kernel module
-make test           # Run tests (module must be loaded)
-make unload         # Unload kernel module
-```
+### Build Commands
+| Command | Description |
+|---------|-------------|
+| `make` | Build everything (kernel module + user apps) |
+| `make kernel` | Build kernel module only |
+| `make user` | Build user applications only |
+| `make clean` | Remove all build artifacts |
+
+### Module Management
+| Command | Description |
+|---------|-------------|
+| `make load` | Build and load kernel module |
+| `make unload` | Unload kernel module |
+
+### Monitoring Commands
+| Command | Description |
+|---------|-------------|
+| `make monitor` | Monitor temperature readings (Python CLI) |
+| `make monitor_cpp` | Monitor temperature readings (C++ CLI) |
+| `make monitor_duration DURATION=10` | Monitor for 10 seconds |
+| `make config` | Show current configuration |
+| `make stats` | Show device statistics |
+
+### Configuration Commands (require sudo)
+| Command | Description |
+|---------|-------------|
+| `make set_sampling PERIOD=50` | Set sampling period to 50ms |
+| `make set_threshold THRESHOLD=30000` | Set threshold to 30°C |
+| `make set_mode MODE=noisy` | Set mode to noisy |
+| `make reset` | Reset all configuration to defaults |
+
+### Testing Commands
+| Command | Description |
+|---------|-------------|
+| `make test` | Run basic tests (module must be loaded) |
+| `make test_alert` | Test alert functionality |
+
+### Help Commands
+| Command | Description |
+|---------|-------------|
+| `make help` | Show all available make commands |
 
 ## Device Tree Integration
 
@@ -118,51 +161,7 @@ simtemp: temperature-sensor@0 {
 ### Testing Device Tree
 ```bash
 # Test device tree functionality
-make test_dt
-
-# Or using direct script commands
 sudo ./scripts/run_demo.sh --test-dt
-```
-
-## Usage Examples
-
-### Basic Monitoring
-```bash
-# Monitor temperature readings (Python)
-./out/user/cli/simtemp_cli_py --monitor
-
-# Monitor temperature readings (C++)
-./out/user/cli/simtemp_cli_cpp --monitor
-
-# Monitor for 10 seconds
-./out/user/cli/simtemp_cli_py --monitor --duration 10
-```
-
-### Configuration
-```bash
-# Show current configuration
-./out/user/cli/simtemp_cli_py --config
-
-# Change sampling period to 50ms
-./out/user/cli/simtemp_cli_py --set-sampling 50
-
-# Set threshold to 30°C
-./out/user/cli/simtemp_cli_py --set-threshold 30000
-
-# Change to noisy mode
-./out/user/cli/simtemp_cli_py --set-mode noisy
-```
-
-### Testing
-```bash
-# Run test mode (verifies threshold crossing)
-./out/user/cli/simtemp_cli_py --test
-
-# Test alert functionality
-make test_alert
-
-# Test device tree functionality
-make test_dt
 ```
 
 ## API Reference
@@ -218,26 +217,24 @@ The driver follows a modular architecture with clear separation of concerns:
 
 The project includes comprehensive testing with multiple approaches:
 
-### Automated Testing
+### Quick Testing
 ```bash
-# Run all tests
-sudo ./scripts/run_demo.sh --test-only
-
-# Test alert functionality
+# Complete test workflow
+make load
+make test
 make test_alert
-
-# Test device tree integration
-make test_dt
+make unload
 ```
 
-### Manual Testing
+### Comprehensive Testing
 ```bash
-# Test basic functionality
+# Run complete demo with all tests
 sudo ./scripts/run_demo.sh
 
 # Test specific features
 sudo ./scripts/run_demo.sh --test-alert
 sudo ./scripts/run_demo.sh --test-dt
+sudo ./scripts/run_demo.sh --test-only
 ```
 
 ### Test Coverage
@@ -317,9 +314,27 @@ dtc -I dts -O dtb -o test.dtb your_file.dts
 
 ### Building from Source
 ```bash
+# Clone and build
 git clone <repository-url>
 cd simtemp
 make
+```
+
+### Development Workflow
+```bash
+# Clean and rebuild
+make clean
+make
+
+# Test changes
+make load
+make test
+make unload
+
+# Debug with monitoring
+make load
+make monitor
+make unload
 ```
 
 ### Code Quality
@@ -366,3 +381,9 @@ NXP Systems Software Engineer Challenge Submission
 - NXP for providing the challenge requirements
 - Open source tools and libraries used in development
 - Device tree community for comprehensive binding documentation
+
+## git repo
+https://github.com/SahidMEMO/simtemp.git
+
+## Video demonstration
+https://1drv.ms/v/c/beaa22ddde41f2e8/ERtuANHMW8JClLtuJkyTVDUBTBPj-ioH78TC_1l5NNOQFA?e=saek52

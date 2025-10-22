@@ -120,6 +120,29 @@ class SimTempDevice:
             except (OSError, IOError) as e:
                 raise SimTempError(f"Failed to set {param}={value}: {e}")
     
+    def reset_to_defaults(self) -> None:
+        """
+        Reset all configuration parameters to their default values
+        
+        Default values:
+        - sampling_ms: 100 (100ms)
+        - threshold_mC: 45000 (45°C)
+        - mode: normal
+        """
+        defaults = {
+            'sampling_ms': 100,
+            'threshold_mC': 45000,
+            'mode': 'normal'
+        }
+        
+        for param, value in defaults.items():
+            sysfs_path = os.path.join(self.sysfs_base, param)
+            try:
+                with open(sysfs_path, 'w') as f:
+                    f.write(str(value))
+            except (OSError, IOError) as e:
+                raise SimTempError(f"Failed to reset {param}={value}: {e}")
+    
     def get_config(self) -> dict:
         """Get current device configuration"""
         config = {}
@@ -255,6 +278,7 @@ def main():
     parser.add_argument("--set-sampling", type=int, help="Set sampling period (ms)")
     parser.add_argument("--set-threshold", type=int, help="Set threshold (mC)")
     parser.add_argument("--set-mode", choices=["normal", "noisy", "ramp"], help="Set mode")
+    parser.add_argument("--reset", action="store_true", help="Reset all configuration to defaults")
     
     args = parser.parse_args()
     
@@ -281,6 +305,16 @@ def main():
             stats = device.get_stats()
             print("Device statistics:")
             for key, value in stats.items():
+                print(f"  {key}: {value}")
+            return
+        
+        # Handle reset command
+        if args.reset:
+            print("Resetting configuration to defaults...")
+            device.reset_to_defaults()
+            print("Configuration reset to defaults:")
+            config = device.get_config()
+            for key, value in config.items():
                 print(f"  {key}: {value}")
             return
         
